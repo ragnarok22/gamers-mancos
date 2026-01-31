@@ -8,10 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` — production build to ./dist/
 - `pnpm preview` — preview production build
 - `pnpm format` — format with Prettier (Astro + Tailwind plugins)
+- `pnpm format:check` — check formatting without writing
 - `pnpm lint` — lint with ESLint (Astro plugin)
 - `pnpm lint:fix` — lint and auto-fix
+- `pnpm typecheck` — typecheck with `astro check`
 
-No test runner is configured. No Makefile.
+No test runner is configured. No Makefile. CI runs format:check, lint, and typecheck on push/PR to main.
 
 ## Architecture
 
