@@ -11,8 +11,19 @@
   --color-electric-cyan: #27e5ff;
   --color-arcade-violet: #7c3aed;
   --color-meme-lime: #b6ff3b;
+  --color-warm-magenta: #ff4fd8;
 
   /* Text */
   --color-text-hi: #f3f6ff;
   --color-text-muted: #aab3cf;
+
+  /* Fonts */
+  --font-orbitron: "Orbitron", sans-serif;
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+  color: var(--color-text-hi);
+  background: var(--color-midnight);
 }

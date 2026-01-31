@@ -1,0 +1,378 @@
+---
+interface Gamer {
+  id: string;
+  name: string;
+  gamerTag: string;
+  photo: string;
+  bio: string;
+  socials: {
+    twitch?: string;
+    youtube?: string;
+    instagram?: string;
+    twitter?: string;
+  };
+}
+
+const gamers: Gamer[] = [
+  {
+    id: "carlos",
+    name: "Carlos Lugones",
+    gamerTag: "CarlosLugones",
+    photo: "/gamers/carlos-lugones.jpg",
+    bio: "Streamer y gamer de corazón. Siempre buscando la jugada perfecta y el clip más épico.",
+    socials: {
+      twitch: "https://twitch.tv/carloslugones",
+      instagram: "https://instagram.com/carloslugones",
+      twitter: "https://twitter.com/carloslugones",
+    },
+  },
+  {
+    id: "heber",
+    name: "Heber",
+    gamerTag: "Heber",
+    photo: "/gamers/heber.png",
+    bio: "Competitivo nato. Si hay ranked, ahí estoy. Los mancos también ganamos.",
+    socials: {
+      twitch: "https://twitch.tv/heber",
+      youtube: "https://youtube.com/@heber",
+      twitter: "https://twitter.com/heber",
+    },
+  },
+  {
+    id: "reinier",
+    name: "Reinier",
+    gamerTag: "Reinier",
+    photo: "/gamers/reinier.jpeg",
+    bio: "El más manco del grupo, pero con más actitud que nadie. Content creator y amante del gaming.",
+    socials: {
+      twitch: "https://twitch.tv/reinier",
+      instagram: "https://instagram.com/reinier",
+      youtube: "https://youtube.com/@reinier",
+    },
+  },
+];
+---
+
+<div id="arena" class="bg-midnight relative h-screen w-screen overflow-hidden">
+  <!-- Background -->
+  <img
+    src="/background.png"
+    alt=""
+    class="absolute inset-0 h-full w-full object-cover opacity-40"
+    fetchpriority="high"
+  />
+
+  <!-- Glow overlays -->
+  <div class="pointer-events-none absolute inset-0" id="glow-overlay"></div>
+
+  <!-- Center content area -->
+  <div
+    class="relative z-10 flex h-full flex-col items-center justify-center px-4"
+  >
+    <!-- Logo (default state) -->
+    <div id="logo-container" class="flex flex-col items-center gap-6">
+      <img
+        src="/logo.png"
+        alt="Gamers Mancos"
+        class="max-h-[40vh] w-auto max-w-[80vw] object-contain drop-shadow-[0_0_40px_rgba(255,61,141,0.5)]"
+      />
+      <p
+        class="font-orbitron text-text-muted text-lg tracking-[0.3em] uppercase"
+      >
+        Los mancos más pro
+      </p>
+    </div>
+
+    <!-- Gamer spotlight (hidden by default) -->
+    <div
+      id="gamer-spotlight"
+      class="flex flex-col items-center"
+      style="display: none;"
+    >
+      <!-- Large image -->
+      <div class="relative mb-6">
+        <div
+          id="spotlight-glow"
+          class="absolute -inset-4 rounded-full opacity-60 blur-2xl"
+          style="background: radial-gradient(circle, rgba(255,61,141,0.4), rgba(39,229,255,0.2), transparent 70%);"
+        >
+        </div>
+        <img
+          id="spotlight-img"
+          src=""
+          alt=""
+          class="relative h-[35vh] w-[35vh] rounded-2xl border-2 border-white/10 object-cover shadow-[0_0_60px_rgba(124,58,237,0.3)]"
+        />
+      </div>
+
+      <!-- Gamer info -->
+      <div id="gamer-info" class="flex flex-col items-center gap-3 text-center">
+        <h2
+          id="gamer-tag"
+          class="font-orbitron text-4xl font-black tracking-wider text-transparent md:text-5xl"
+          style="background: linear-gradient(90deg, #FF3D8D, #7C3AED, #27E5FF); -webkit-background-clip: text; background-clip: text;"
+        >
+        </h2>
+        <p
+          id="gamer-name"
+          class="text-text-muted text-lg font-light tracking-wide"
+        >
+        </p>
+        <p
+          id="gamer-bio"
+          class="text-text-muted/80 max-w-md text-sm leading-relaxed"
+        >
+        </p>
+
+        <!-- Social links -->
+        <div id="gamer-socials" class="mt-2 flex gap-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom gamers bar -->
+  <div
+    id="gamers-bar"
+    class="absolute right-0 bottom-0 left-0 z-20 flex items-end justify-center gap-2 px-4 pb-6 md:gap-4"
+  >
+    {
+      gamers.map((gamer) => (
+        <button
+          class="gamer-thumb group relative cursor-pointer border-0 bg-transparent p-0 transition-transform duration-300 outline-none hover:-translate-y-2 hover:scale-110"
+          data-gamer-id={gamer.id}
+          data-gamer-tag={gamer.gamerTag}
+          data-gamer-name={gamer.name}
+          data-gamer-photo={gamer.photo}
+          data-gamer-bio={gamer.bio}
+          data-gamer-socials={JSON.stringify(gamer.socials)}
+        >
+          <div class="group-hover:border-neon-pink/60 relative overflow-hidden rounded-xl border-2 border-white/10 transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(255,61,141,0.4)]">
+            <img
+              src={gamer.photo}
+              alt={gamer.gamerTag}
+              class="h-24 w-20 object-cover transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
+              loading="lazy"
+            />
+            <div class="from-midnight/80 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+          </div>
+          <span class="font-orbitron text-text-muted/70 group-hover:text-electric-cyan mt-2 block text-center text-[10px] tracking-wider uppercase transition-colors duration-300 md:text-xs">
+            {gamer.gamerTag}
+          </span>
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  import gsap from "gsap";
+
+  const logoContainer = document.getElementById("logo-container")!;
+  const spotlight = document.getElementById("gamer-spotlight")!;
+  const spotlightImg = document.getElementById(
+    "spotlight-img",
+  ) as HTMLImageElement;
+  const gamerTag = document.getElementById("gamer-tag")!;
+  const gamerName = document.getElementById("gamer-name")!;
+  const gamerBio = document.getElementById("gamer-bio")!;
+  const gamerSocials = document.getElementById("gamer-socials")!;
+  const gamerInfo = document.getElementById("gamer-info")!;
+  const thumbs = document.querySelectorAll<HTMLButtonElement>(".gamer-thumb");
+
+  let currentGamerId: string | null = null;
+  let isAnimating = false;
+
+  const socialIcons: Record<string, string> = {
+    twitch: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>`,
+    youtube: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
+    instagram: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>`,
+    twitter: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+  };
+
+  function showGamer(button: HTMLButtonElement) {
+    const gamerId = button.dataset.gamerId!;
+    if (gamerId === currentGamerId || isAnimating) return;
+    isAnimating = true;
+    currentGamerId = gamerId;
+
+    const photo = button.dataset.gamerPhoto!;
+    const tag = button.dataset.gamerTag!;
+    const name = button.dataset.gamerName!;
+    const bio = button.dataset.gamerBio!;
+    const socials = JSON.parse(button.dataset.gamerSocials!);
+
+    // Update active thumb styling
+    thumbs.forEach((t) => t.classList.remove("active-thumb"));
+    button.classList.add("active-thumb");
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        isAnimating = false;
+      },
+    });
+
+    // If logo is visible, fade it out first
+    if (logoContainer.style.display !== "none") {
+      tl.to(logoContainer, {
+        opacity: 0,
+        y: -30,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: () => {
+          logoContainer.style.display = "none";
+        },
+      });
+    }
+
+    // If spotlight is already showing, fade it out first
+    if (spotlight.style.display !== "none" && spotlight.style.display !== "") {
+      tl.to(spotlight, {
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.in",
+      });
+    }
+
+    // Set new data
+    tl.call(() => {
+      spotlightImg.src = photo;
+      spotlightImg.alt = tag;
+      gamerTag.textContent = tag;
+      gamerName.textContent = name;
+      gamerBio.textContent = bio;
+
+      // Build social links
+      gamerSocials.innerHTML = "";
+      for (const [platform, url] of Object.entries(socials)) {
+        if (!url) continue;
+        const a = document.createElement("a");
+        a.href = url as string;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.className =
+          "flex items-center justify-center rounded-full border border-white/10 bg-grape/80 p-3 text-text-muted transition-all duration-300 hover:border-electric-cyan/50 hover:text-electric-cyan hover:shadow-[0_0_15px_rgba(39,229,255,0.3)]";
+        a.innerHTML = socialIcons[platform] || "";
+        gamerSocials.appendChild(a);
+      }
+
+      spotlight.style.display = "flex";
+      gsap.set(spotlight, { opacity: 0 });
+      gsap.set(spotlightImg, { y: 40, opacity: 0, scale: 0.95 });
+      gsap.set(gamerInfo, { y: 20, opacity: 0 });
+    });
+
+    // Animate spotlight in: image first with fade + translate up
+    tl.to(spotlight, {
+      opacity: 1,
+      duration: 0.1,
+    });
+
+    tl.to(spotlightImg, {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      duration: 0.6,
+      ease: "power3.out",
+    });
+
+    // Then info fades in
+    tl.to(
+      gamerInfo,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out",
+      },
+      "-=0.2",
+    );
+  }
+
+  function resetToLogo() {
+    if (!currentGamerId || isAnimating) return;
+    isAnimating = true;
+    currentGamerId = null;
+
+    thumbs.forEach((t) => t.classList.remove("active-thumb"));
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        isAnimating = false;
+      },
+    });
+
+    tl.to(spotlight, {
+      opacity: 0,
+      y: 20,
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => {
+        spotlight.style.display = "none";
+        gsap.set(spotlight, { y: 0 });
+      },
+    });
+
+    tl.call(() => {
+      logoContainer.style.display = "flex";
+      gsap.set(logoContainer, { opacity: 0, y: 30 });
+    });
+
+    tl.to(logoContainer, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: "power3.out",
+    });
+  }
+
+  // Event listeners
+  thumbs.forEach((thumb) => {
+    thumb.addEventListener("mouseenter", () => showGamer(thumb));
+    thumb.addEventListener("focus", () => showGamer(thumb));
+  });
+
+  // Click on background area resets to logo
+  document.getElementById("arena")!.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (
+      !target.closest(".gamer-thumb") &&
+      !target.closest("#gamer-spotlight")
+    ) {
+      resetToLogo();
+    }
+  });
+</script>
+
+<style>
+  .active-thumb > div {
+    border-color: theme("colors.neon-pink") !important;
+    box-shadow: 0 0 25px rgba(255, 61, 141, 0.5);
+  }
+
+  .active-thumb span {
+    color: theme("colors.electric-cyan") !important;
+  }
+
+  #glow-overlay {
+    background:
+      radial-gradient(
+        circle at 30% 20%,
+        rgba(255, 61, 141, 0.15),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 80% 30%,
+        rgba(39, 229, 255, 0.1),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 50% 80%,
+        rgba(124, 58, 237, 0.12),
+        transparent 50%
+      );
+  }
+
+  .font-orbitron {
+    font-family: var(--font-orbitron);
+  }
+</style>
