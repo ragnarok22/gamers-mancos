@@ -1,0 +1,65 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout
+  title="404 — Gamers Mancos"
+  description="Página no encontrada. Vuelve al inicio de Gamers Mancos."
+>
+  <div
+    class="bg-midnight relative flex h-screen w-screen flex-col items-center justify-center overflow-hidden"
+  >
+    <!-- Background glow -->
+    <div class="pointer-events-none absolute inset-0" id="glow-404"></div>
+
+    <!-- Logo -->
+    <img
+      src="/logo.png"
+      alt="Gamers Mancos"
+      class="mb-8 max-h-[20vh] w-auto max-w-[60vw] object-contain opacity-80 drop-shadow-[0_0_30px_rgba(255,61,141,0.4)]"
+    />
+
+    <!-- 404 text -->
+    <h1
+      class="font-orbitron text-[8rem] leading-none font-black tracking-wider text-transparent md:text-[12rem]"
+      style="background: linear-gradient(90deg, #FF3D8D, #7C3AED, #27E5FF); -webkit-background-clip: text; background-clip: text;"
+    >
+      404
+    </h1>
+
+    <!-- Message -->
+    <p class="text-text-muted mt-4 max-w-md text-center text-lg">
+      Esta página no existe, manco. Pero no te preocupes, hasta los pros se
+      pierden.
+    </p>
+
+    <!-- Back to home -->
+    <a
+      href="/"
+      class="font-orbitron hover:border-neon-pink/60 mt-8 inline-block rounded-xl border-2 border-white/10 px-8 py-3 text-sm font-bold tracking-wider uppercase transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,61,141,0.4)]"
+      style="background: linear-gradient(135deg, rgba(255,61,141,0.15), rgba(124,58,237,0.15)); color: var(--color-electric-cyan);"
+    >
+      Volver al inicio
+    </a>
+  </div>
+</Layout>
+
+<style>
+  #glow-404 {
+    background:
+      radial-gradient(
+        circle at 50% 40%,
+        rgba(255, 61, 141, 0.12),
+        transparent 55%
+      ),
+      radial-gradient(
+        circle at 50% 60%,
+        rgba(124, 58, 237, 0.1),
+        transparent 50%
+      );
+  }
+
+  .font-orbitron {
+    font-family: var(--font-orbitron);
+  }
+</style>

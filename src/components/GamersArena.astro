@@ -87,6 +87,8 @@ const gamers: Gamer[] = [
     <div
       id="gamer-spotlight"
       class="flex flex-col items-center"
+      role="region"
+      aria-label="Perfil del gamer"
       style="display: none;"
     >
       <!-- Large image -->
@@ -100,13 +102,17 @@ const gamers: Gamer[] = [
         <img
           id="spotlight-img"
           src=""
-          alt=""
+          alt="Foto del gamer"
           class="relative h-[35vh] w-[35vh] rounded-2xl border-2 border-white/10 object-cover shadow-[0_0_60px_rgba(124,58,237,0.3)]"
         />
       </div>
 
       <!-- Gamer info -->
-      <div id="gamer-info" class="flex flex-col items-center gap-3 text-center">
+      <div
+        id="gamer-info"
+        class="flex flex-col items-center gap-3 text-center"
+        aria-live="polite"
+      >
         <h2
           id="gamer-tag"
           class="gamer-tag-shine font-orbitron text-4xl font-black tracking-wider text-transparent md:text-5xl"
@@ -129,6 +135,8 @@ const gamers: Gamer[] = [
   <div
     id="gamers-bar"
     class="absolute right-0 bottom-0 left-0 z-20 flex items-end justify-center gap-2 px-4 pb-6 md:gap-4"
+    role="group"
+    aria-label="Seleccionar gamer"
   >
     {
       gamers.map((gamer) => (
@@ -140,6 +148,7 @@ const gamers: Gamer[] = [
           data-gamer-photo={gamer.photo}
           data-gamer-bio={gamer.bio}
           data-gamer-socials={JSON.stringify(gamer.socials)}
+          aria-label={`Ver perfil de ${gamer.gamerTag}`}
         >
           <div class="group-hover:border-neon-pink/60 relative overflow-hidden rounded-xl border-2 border-white/10 transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(255,61,141,0.4)]">
             <img
@@ -175,6 +184,7 @@ const gamers: Gamer[] = [
 
   let currentGamerId: string | null = null;
   let isAnimating = false;
+  let logoPulse: gsap.core.Tween | null = null;
 
   const socialIcons: Record<string, string> = {
     twitch: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>`,
@@ -183,14 +193,52 @@ const gamers: Gamer[] = [
     twitter: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
   };
 
+  const platformNames: Record<string, string> = {
+    twitch: "Twitch",
+    youtube: "YouTube",
+    instagram: "Instagram",
+    twitter: "X (Twitter)",
+  };
+
+  // Logo idle pulse animation
+  function startLogoPulse() {
+    const logoImg = logoContainer.querySelector("img");
+    if (!logoImg) return;
+    logoPulse = gsap.to(logoImg, {
+      scale: 1.02,
+      filter: "drop-shadow(0 0 50px rgba(255,61,141,0.6))",
+      duration: 2,
+      ease: "sine.inOut",
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  function stopLogoPulse() {
+    if (logoPulse) {
+      logoPulse.kill();
+      logoPulse = null;
+      const logoImg = logoContainer.querySelector("img");
+      if (logoImg) {
+        gsap.set(logoImg, { scale: 1, clearProps: "filter" });
+      }
+    }
+  }
+
+  // Start the pulse on load
+  startLogoPulse();
+
   function showGamer(button: HTMLButtonElement) {
     const gamerId = button.dataset.gamerId!;
     if (gamerId === currentGamerId || isAnimating) return;
     isAnimating = true;
+
+    const wasShowingGamer = currentGamerId !== null;
     currentGamerId = gamerId;
 
     const photo = button.dataset.gamerPhoto!;
     const tag = button.dataset.gamerTag!;
+    const name = button.dataset.gamerName!;
     const bio = button.dataset.gamerBio!;
     const socials = JSON.parse(button.dataset.gamerSocials!);
 
@@ -204,8 +252,9 @@ const gamers: Gamer[] = [
       },
     });
 
-    // If logo is visible, fade it out first
+    // If logo is visible, fade it out first and kill pulse
     if (logoContainer.style.display !== "none") {
+      stopLogoPulse();
       tl.to(logoContainer, {
         opacity: 0,
         y: -30,
@@ -217,19 +266,33 @@ const gamers: Gamer[] = [
       });
     }
 
-    // If spotlight is already showing, fade it out first
-    if (spotlight.style.display !== "none" && spotlight.style.display !== "") {
-      tl.to(spotlight, {
+    // If spotlight is already showing (gamer-to-gamer), crossfade transition
+    if (
+      wasShowingGamer &&
+      spotlight.style.display !== "none" &&
+      spotlight.style.display !== ""
+    ) {
+      tl.to(spotlightImg, {
+        y: 30,
         opacity: 0,
-        duration: 0.2,
+        duration: 0.25,
         ease: "power2.in",
       });
+      tl.to(
+        gamerInfo,
+        {
+          opacity: 0,
+          duration: 0.2,
+          ease: "power2.in",
+        },
+        "<",
+      );
     }
 
     // Set new data
     tl.call(() => {
       spotlightImg.src = photo;
-      spotlightImg.alt = tag;
+      spotlightImg.alt = `Foto de ${name}`;
       gamerTag.textContent = tag;
       gamerBio.textContent = bio;
 
@@ -241,29 +304,43 @@ const gamers: Gamer[] = [
         a.href = url as string;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
+        a.setAttribute("aria-label", platformNames[platform] || platform);
         a.className =
-          "flex items-center justify-center rounded-full border border-white/10 bg-grape/80 p-3 text-text-muted transition-all duration-300 hover:border-electric-cyan/50 hover:text-electric-cyan hover:shadow-[0_0_15px_rgba(39,229,255,0.3)]";
+          "social-link flex items-center justify-center rounded-full border border-white/10 bg-grape/80 p-3 text-text-muted transition-all duration-300 hover:border-electric-cyan/50 hover:text-electric-cyan hover:shadow-[0_0_15px_rgba(39,229,255,0.3)]";
         a.innerHTML = socialIcons[platform] || "";
         gamerSocials.appendChild(a);
       }
 
       spotlight.style.display = "flex";
-      gsap.set(spotlight, { opacity: 0 });
-      gsap.set(spotlightImg, { y: 40, opacity: 0, scale: 0.95 });
+
+      if (!wasShowingGamer) {
+        gsap.set(spotlight, { opacity: 0 });
+      }
+      gsap.set(spotlightImg, {
+        y: wasShowingGamer ? -30 : 40,
+        opacity: 0,
+        scale: 0.95,
+      });
       gsap.set(gamerInfo, { y: 20, opacity: 0 });
+
+      // Set social links to hidden for stagger
+      const socialLinks = gamerSocials.querySelectorAll(".social-link");
+      gsap.set(socialLinks, { opacity: 0, y: 10 });
     });
 
-    // Animate spotlight in: image first with fade + translate up
-    tl.to(spotlight, {
-      opacity: 1,
-      duration: 0.1,
-    });
+    // Animate spotlight in
+    if (!wasShowingGamer) {
+      tl.to(spotlight, {
+        opacity: 1,
+        duration: 0.1,
+      });
+    }
 
     tl.to(spotlightImg, {
       y: 0,
       opacity: 1,
       scale: 1,
-      duration: 0.6,
+      duration: wasShowingGamer ? 0.45 : 0.6,
       ease: "power3.out",
     });
 
@@ -277,6 +354,24 @@ const gamers: Gamer[] = [
         ease: "power2.out",
       },
       "-=0.2",
+    );
+
+    // Stagger social link icons
+    tl.call(
+      () => {
+        const socialLinks = gamerSocials.querySelectorAll(".social-link");
+        if (socialLinks.length) {
+          gsap.to(socialLinks, {
+            opacity: 1,
+            y: 0,
+            duration: 0.3,
+            stagger: 0.08,
+            ease: "power2.out",
+          });
+        }
+      },
+      [],
+      "-=0.3",
     );
 
     // Trigger shine animation on gamer tag
@@ -325,6 +420,9 @@ const gamers: Gamer[] = [
       y: 0,
       duration: 0.5,
       ease: "power3.out",
+      onComplete: () => {
+        startLogoPulse();
+      },
     });
   }
 
@@ -341,6 +439,30 @@ const gamers: Gamer[] = [
       !target.closest(".gamer-thumb") &&
       !target.closest("#gamer-spotlight")
     ) {
+      resetToLogo();
+    }
+  });
+
+  // Keyboard navigation
+  document.addEventListener("keydown", (e) => {
+    const thumbArray = Array.from(thumbs);
+    const currentIndex = thumbArray.findIndex(
+      (t) => t.dataset.gamerId === currentGamerId,
+    );
+
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIndex =
+        currentIndex < thumbArray.length - 1 ? currentIndex + 1 : 0;
+      thumbArray[nextIndex].focus();
+      showGamer(thumbArray[nextIndex]);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevIndex =
+        currentIndex > 0 ? currentIndex - 1 : thumbArray.length - 1;
+      thumbArray[prevIndex].focus();
+      showGamer(thumbArray[prevIndex]);
+    } else if (e.key === "Escape") {
       resetToLogo();
     }
   });

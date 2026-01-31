@@ -15,7 +15,7 @@ const canonicalUrl = new URL(
   Astro.url.pathname,
   Astro.site ?? "https://gamersmancos.com",
 );
-const ogImage = new URL("/logo.png", canonicalUrl.origin);
+const ogImage = new URL("/og-image.png", canonicalUrl.origin);
 ---
 
 <!doctype html>
@@ -51,6 +51,9 @@ const ogImage = new URL("/logo.png", canonicalUrl.origin);
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage.href} />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/background.png" as="image" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
