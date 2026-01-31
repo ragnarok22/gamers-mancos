@@ -8,8 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` — production build to ./dist/
 - `pnpm preview` — preview production build
 - `pnpm format` — format with Prettier (Astro + Tailwind plugins)
+- `pnpm lint` — lint with ESLint (Astro plugin)
+- `pnpm lint:fix` — lint and auto-fix
 
-No test runner or linter is configured. No Makefile.
+No test runner is configured. No Makefile.
 
 ## Architecture
 
