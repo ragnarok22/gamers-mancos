@@ -6,6 +6,7 @@ interface Gamer {
   name: string;
   gamerTag: string;
   photo: string;
+  fullPhoto?: string;
   bio: string;
   platforms: Platform[];
   socials: {
@@ -34,7 +35,8 @@ const gamers: Gamer[] = [
     id: "heber",
     name: "Heber",
     gamerTag: "Yudai",
-    photo: "/gamers/heber.png",
+    photo: "/gamers/heber.webp",
+    fullPhoto: "/gamers/heber-full.webp",
     bio: "Competitivo nato. Si hay ranked, ahí estoy. Los mancos también ganamos.",
     platforms: ["nintendo", "pc"],
     socials: {
@@ -47,7 +49,8 @@ const gamers: Gamer[] = [
     id: "reinier",
     name: "Reinier",
     gamerTag: "Ragnarok",
-    photo: "/gamers/reinier.jpeg",
+    photo: "/gamers/reinier.webp",
+    fullPhoto: "/gamers/reinier-full.webp",
     bio: "El más manco del grupo, pero con más actitud que nadie. Content creator y amante del gaming.",
     platforms: ["ps5"],
     socials: {
@@ -92,13 +95,13 @@ const gamers: Gamer[] = [
     <!-- Gamer spotlight (hidden by default) -->
     <div
       id="gamer-spotlight"
-      class="flex flex-col items-center"
+      class="relative flex flex-col items-center justify-end"
       role="region"
       aria-label="Perfil del gamer"
       style="display: none;"
     >
       <!-- Large image -->
-      <div class="relative mb-3 md:mb-6">
+      <div class="relative">
         <div
           id="spotlight-glow"
           class="absolute -inset-4 rounded-full opacity-60 blur-2xl"
@@ -109,22 +112,24 @@ const gamers: Gamer[] = [
           id="spotlight-img"
           src=""
           alt="Foto del gamer"
-          class="relative h-[28vh] w-[28vh] rounded-2xl border-2 border-white/10 object-cover shadow-[0_0_60px_rgba(124,58,237,0.3)] md:h-[35vh] md:w-[35vh]"
+          class="relative h-[60vh] w-auto object-contain md:h-[75vh]"
         />
       </div>
 
-      <!-- Gamer info -->
+      <!-- Gamer tag overlapping image -->
+      <h2
+        id="gamer-tag"
+        class="gamer-tag-shine font-orbitron pointer-events-none absolute bottom-24 z-10 text-6xl font-black tracking-wider text-transparent md:bottom-32 md:text-8xl"
+        style="background: linear-gradient(90deg, #FF3D8D, #7C3AED, #27E5FF); -webkit-background-clip: text; background-clip: text;"
+      >
+      </h2>
+
+      <!-- Gamer info below -->
       <div
         id="gamer-info"
-        class="flex flex-col items-center gap-3 text-center"
+        class="absolute bottom-2 z-10 flex flex-col items-center gap-2 text-center md:bottom-6"
         aria-live="polite"
       >
-        <h2
-          id="gamer-tag"
-          class="gamer-tag-shine font-orbitron text-4xl font-black tracking-wider text-transparent md:text-5xl"
-          style="background: linear-gradient(90deg, #FF3D8D, #7C3AED, #27E5FF); -webkit-background-clip: text; background-clip: text;"
-        >
-        </h2>
         <p
           id="gamer-bio"
           class="text-text-muted/80 max-w-md text-sm leading-relaxed"
@@ -132,10 +137,10 @@ const gamers: Gamer[] = [
         </p>
 
         <!-- Platform icons -->
-        <div id="gamer-platforms" class="mt-1 flex gap-3"></div>
+        <div id="gamer-platforms" class="flex gap-3"></div>
 
         <!-- Social links -->
-        <div id="gamer-socials" class="mt-2 flex gap-4"></div>
+        <div id="gamer-socials" class="flex gap-4"></div>
       </div>
     </div>
   </div>
@@ -155,20 +160,20 @@ const gamers: Gamer[] = [
           data-gamer-tag={gamer.gamerTag}
           data-gamer-name={gamer.name}
           data-gamer-photo={gamer.photo}
+          data-gamer-full-photo={gamer.fullPhoto || gamer.photo}
           data-gamer-bio={gamer.bio}
           data-gamer-platforms={JSON.stringify(gamer.platforms)}
           data-gamer-socials={JSON.stringify(gamer.socials)}
           aria-label={`Ver perfil de ${gamer.gamerTag}`}
         >
           <div class="thumb-frame relative">
-            <div class="relative overflow-hidden rounded-lg">
+            <div class="relative overflow-hidden">
               <img
                 src={gamer.photo}
                 alt={gamer.gamerTag}
-                class="thumb-img h-24 w-20 object-cover transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
+                class="thumb-img h-24 w-20 object-contain transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
                 loading="lazy"
               />
-              <div class="from-midnight/80 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
               <div class="thumb-shine pointer-events-none absolute inset-0" />
             </div>
           </div>
@@ -342,7 +347,7 @@ const gamers: Gamer[] = [
     const wasShowingGamer = currentGamerId !== null;
     currentGamerId = gamerId;
 
-    const photo = button.dataset.gamerPhoto!;
+    const photo = button.dataset.gamerFullPhoto || button.dataset.gamerPhoto!;
     const tag = button.dataset.gamerTag!;
     const name = button.dataset.gamerName!;
     const bio = button.dataset.gamerBio!;
@@ -432,6 +437,7 @@ const gamers: Gamer[] = [
         opacity: 0,
         scale: 0.95,
       });
+      gsap.set(gamerTag, { y: 20, opacity: 0 });
       gsap.set(gamerInfo, { y: 20, opacity: 0 });
 
       // Set platform badges and social links to hidden for stagger
@@ -456,6 +462,18 @@ const gamers: Gamer[] = [
       duration: wasShowingGamer ? 0.45 : 0.6,
       ease: "power3.out",
     });
+
+    // Gamer tag overlaps image
+    tl.to(
+      gamerTag,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out",
+      },
+      "-=0.3",
+    );
 
     // Then info fades in
     tl.to(
