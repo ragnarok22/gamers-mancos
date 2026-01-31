@@ -168,11 +168,11 @@ const gamers: Gamer[] = [
           aria-label={`Ver perfil de ${gamer.gamerTag}`}
         >
           <div class="thumb-frame relative">
-            <div class="relative overflow-hidden">
+            <div class="relative flex items-center justify-center overflow-hidden">
               <img
                 src={gamer.photo}
                 alt={gamer.gamerTag}
-                class="thumb-img h-24 w-20 object-contain transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
+                class="thumb-img h-20 w-20 object-contain transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
                 loading="lazy"
               />
               <div class="thumb-shine pointer-events-none absolute inset-0" />
@@ -659,6 +659,11 @@ const gamers: Gamer[] = [
 </script>
 
 <style>
+  .thumb-frame {
+    width: 128px;
+    height: 128px;
+  }
+
   /* Floating corner bracket selector */
   #thumb-selector {
     z-index: 30;
