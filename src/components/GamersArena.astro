@@ -1,10 +1,13 @@
 ---
+type Platform = "nintendo" | "ps5" | "ps4" | "pc";
+
 interface Gamer {
   id: string;
   name: string;
   gamerTag: string;
   photo: string;
   bio: string;
+  platforms: Platform[];
   socials: {
     twitch?: string;
     youtube?: string;
@@ -20,6 +23,7 @@ const gamers: Gamer[] = [
     gamerTag: "CarlosLugones",
     photo: "/gamers/carlos-lugones.jpg",
     bio: "Streamer y gamer de corazón. Siempre buscando la jugada perfecta y el clip más épico.",
+    platforms: ["ps5"],
     socials: {
       twitch: "https://twitch.tv/carloslugones",
       instagram: "https://instagram.com/carloslugones",
@@ -32,6 +36,7 @@ const gamers: Gamer[] = [
     gamerTag: "Yudai",
     photo: "/gamers/heber.png",
     bio: "Competitivo nato. Si hay ranked, ahí estoy. Los mancos también ganamos.",
+    platforms: ["nintendo", "pc"],
     socials: {
       twitch: "https://www.twitch.tv/yudaih",
       youtube: "https://youtube.com/@heber",
@@ -44,6 +49,7 @@ const gamers: Gamer[] = [
     gamerTag: "Ragnarok",
     photo: "/gamers/reinier.jpeg",
     bio: "El más manco del grupo, pero con más actitud que nadie. Content creator y amante del gaming.",
+    platforms: ["ps5"],
     socials: {
       twitch: "https://twitch.tv/ragnarokreinier",
       instagram: "https://instagram.com/ragnarokreinier",
@@ -125,6 +131,9 @@ const gamers: Gamer[] = [
         >
         </p>
 
+        <!-- Platform icons -->
+        <div id="gamer-platforms" class="mt-1 flex gap-3"></div>
+
         <!-- Social links -->
         <div id="gamer-socials" class="mt-2 flex gap-4"></div>
       </div>
@@ -147,6 +156,7 @@ const gamers: Gamer[] = [
           data-gamer-name={gamer.name}
           data-gamer-photo={gamer.photo}
           data-gamer-bio={gamer.bio}
+          data-gamer-platforms={JSON.stringify(gamer.platforms)}
           data-gamer-socials={JSON.stringify(gamer.socials)}
           aria-label={`Ver perfil de ${gamer.gamerTag}`}
         >
@@ -179,6 +189,7 @@ const gamers: Gamer[] = [
   const gamerTag = document.getElementById("gamer-tag")!;
   const gamerBio = document.getElementById("gamer-bio")!;
   const gamerSocials = document.getElementById("gamer-socials")!;
+  const gamerPlatforms = document.getElementById("gamer-platforms")!;
   const gamerInfo = document.getElementById("gamer-info")!;
   const thumbs = document.querySelectorAll<HTMLButtonElement>(".gamer-thumb");
 
@@ -202,11 +213,25 @@ const gamers: Gamer[] = [
     twitter: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
   };
 
-  const platformNames: Record<string, string> = {
+  const socialPlatformNames: Record<string, string> = {
     twitch: "Twitch",
     youtube: "YouTube",
     instagram: "Instagram",
     twitter: "X (Twitter)",
+  };
+
+  const platformIcons: Record<string, string> = {
+    nintendo: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M10.04 20.4H7.12c-.57 0-1.02-.2-1.36-.59-.35-.4-.52-.88-.52-1.46V5.65c0-.58.17-1.07.52-1.46.34-.4.8-.59 1.36-.59h2.93c1.52 0 2.8.53 3.84 1.59s1.56 2.34 1.56 3.86-.52 2.8-1.56 3.86-2.32 1.59-3.84 1.59H8.98v5.9zm0-8.45c.77 0 1.42-.27 1.96-.81.53-.54.8-1.19.8-1.95s-.27-1.41-.8-1.95c-.54-.54-1.2-.81-1.96-.81H8.98v5.52h1.06zM16.88 3.6h-2.93c.18.22.34.45.49.7h2.43v15.4h-2.43c-.15.25-.31.48-.49.7h2.93c.57 0 1.02-.2 1.36-.59.35-.4.52-.88.52-1.46V5.65c0-.58-.17-1.07-.52-1.46-.34-.4-.8-.59-1.36-.59z"/></svg>`,
+    ps5: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.886.49.266.397.974.397 1.664v5.894c1.985 1.013 3.59.066 3.59-2.29 0-2.42-1.2-4.128-4.166-5.058-1.633-.513-3.05-.864-4.53-1.416zm9.985 12.78c-1.395-.736-3.15-1.263-3.15-1.263l-2.925 1.04v2.368l3.862-1.373c.593-.205.683.106.2.376-1.193.672-6.262 2.222-6.262 2.222l-2.085-.727s3.93-1.393 5.753-2.069c2.011-.726 4.462-.994 5.618.18.586.591.065 1.484-1.011 2.246zm-16.97.65c1.918 1.14 4.69 1.775 4.69 1.775l1.62-.58v-2.36l-3.27 1.165c-.594.205-.684-.106-.2-.376.963-.54 3.35-1.237 4.82-1.755v-2.108c-.24.05-.48.112-.73.176-1.932.54-3.96 1.21-5.64.583-1.21-.45-1.1-1.48.71-2.148 0 0 0 0 0 0l1.62-.607V7.552l-.44.164c-2.77 1.028-5.54 2.14-5.54 4.822 0 1.324.776 2.64 2.36 3.488z"/></svg>`,
+    ps4: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M8.985 2.596v17.548l3.915 1.261V6.688c0-.69.304-1.151.794-.886.49.266.397.974.397 1.664v5.894c1.985 1.013 3.59.066 3.59-2.29 0-2.42-1.2-4.128-4.166-5.058-1.633-.513-3.05-.864-4.53-1.416zm9.985 12.78c-1.395-.736-3.15-1.263-3.15-1.263l-2.925 1.04v2.368l3.862-1.373c.593-.205.683.106.2.376-1.193.672-6.262 2.222-6.262 2.222l-2.085-.727s3.93-1.393 5.753-2.069c2.011-.726 4.462-.994 5.618.18.586.591.065 1.484-1.011 2.246zm-16.97.65c1.918 1.14 4.69 1.775 4.69 1.775l1.62-.58v-2.36l-3.27 1.165c-.594.205-.684-.106-.2-.376.963-.54 3.35-1.237 4.82-1.755v-2.108c-.24.05-.48.112-.73.176-1.932.54-3.96 1.21-5.64.583-1.21-.45-1.1-1.48.71-2.148 0 0 0 0 0 0l1.62-.607V7.552l-.44.164c-2.77 1.028-5.54 2.14-5.54 4.822 0 1.324.776 2.64 2.36 3.488z"/></svg>`,
+    pc: `<svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M21 2H3a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h7v2H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-2v-2h7a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-1 13H4V4h16v11z"/></svg>`,
+  };
+
+  const gamingPlatformNames: Record<string, string> = {
+    nintendo: "Nintendo",
+    ps5: "PS5",
+    ps4: "PS4",
+    pc: "PC",
   };
 
   // Logo idle pulse animation
@@ -251,6 +276,7 @@ const gamers: Gamer[] = [
     const tag = button.dataset.gamerTag!;
     const name = button.dataset.gamerName!;
     const bio = button.dataset.gamerBio!;
+    const platforms: string[] = JSON.parse(button.dataset.gamerPlatforms!);
     const socials = JSON.parse(button.dataset.gamerSocials!);
 
     // Update active thumb styling
@@ -307,6 +333,16 @@ const gamers: Gamer[] = [
       gamerTag.textContent = tag;
       gamerBio.textContent = bio;
 
+      // Build platform badges
+      gamerPlatforms.innerHTML = "";
+      for (const platform of platforms) {
+        const badge = document.createElement("span");
+        badge.className =
+          "platform-badge flex items-center gap-1.5 rounded-full border border-white/10 bg-grape/60 px-3 py-1 text-xs text-text-muted";
+        badge.innerHTML = `${platformIcons[platform] || ""}<span class="font-orbitron tracking-wider">${gamingPlatformNames[platform] || platform}</span>`;
+        gamerPlatforms.appendChild(badge);
+      }
+
       // Build social links
       gamerSocials.innerHTML = "";
       for (const [platform, url] of Object.entries(socials)) {
@@ -315,7 +351,7 @@ const gamers: Gamer[] = [
         a.href = url as string;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
-        a.setAttribute("aria-label", platformNames[platform] || platform);
+        a.setAttribute("aria-label", socialPlatformNames[platform] || platform);
         a.className =
           "social-link flex items-center justify-center rounded-full border border-white/10 bg-grape/80 p-3 text-text-muted transition-all duration-300 hover:border-electric-cyan/50 hover:text-electric-cyan hover:shadow-[0_0_15px_rgba(39,229,255,0.3)]";
         a.innerHTML = socialIcons[platform] || "";
@@ -334,7 +370,9 @@ const gamers: Gamer[] = [
       });
       gsap.set(gamerInfo, { y: 20, opacity: 0 });
 
-      // Set social links to hidden for stagger
+      // Set platform badges and social links to hidden for stagger
+      const platformBadges = gamerPlatforms.querySelectorAll(".platform-badge");
+      gsap.set(platformBadges, { opacity: 0, y: 10 });
       const socialLinks = gamerSocials.querySelectorAll(".social-link");
       gsap.set(socialLinks, { opacity: 0, y: 10 });
     });
@@ -367,6 +405,25 @@ const gamers: Gamer[] = [
       "-=0.2",
     );
 
+    // Stagger platform badges
+    tl.call(
+      () => {
+        const platformBadges =
+          gamerPlatforms.querySelectorAll(".platform-badge");
+        if (platformBadges.length) {
+          gsap.to(platformBadges, {
+            opacity: 1,
+            y: 0,
+            duration: 0.3,
+            stagger: 0.08,
+            ease: "power2.out",
+          });
+        }
+      },
+      [],
+      "-=0.3",
+    );
+
     // Stagger social link icons
     tl.call(
       () => {
@@ -382,7 +439,7 @@ const gamers: Gamer[] = [
         }
       },
       [],
-      "-=0.3",
+      "-=0.2",
     );
 
     // Trigger shine animation on gamer tag
