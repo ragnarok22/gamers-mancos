@@ -109,15 +109,10 @@ const gamers: Gamer[] = [
       <div id="gamer-info" class="flex flex-col items-center gap-3 text-center">
         <h2
           id="gamer-tag"
-          class="font-orbitron text-4xl font-black tracking-wider text-transparent md:text-5xl"
+          class="gamer-tag-shine font-orbitron text-4xl font-black tracking-wider text-transparent md:text-5xl"
           style="background: linear-gradient(90deg, #FF3D8D, #7C3AED, #27E5FF); -webkit-background-clip: text; background-clip: text;"
         >
         </h2>
-        <p
-          id="gamer-name"
-          class="text-text-muted text-lg font-light tracking-wide"
-        >
-        </p>
         <p
           id="gamer-bio"
           class="text-text-muted/80 max-w-md text-sm leading-relaxed"
@@ -173,7 +168,6 @@ const gamers: Gamer[] = [
     "spotlight-img",
   ) as HTMLImageElement;
   const gamerTag = document.getElementById("gamer-tag")!;
-  const gamerName = document.getElementById("gamer-name")!;
   const gamerBio = document.getElementById("gamer-bio")!;
   const gamerSocials = document.getElementById("gamer-socials")!;
   const gamerInfo = document.getElementById("gamer-info")!;
@@ -197,7 +191,6 @@ const gamers: Gamer[] = [
 
     const photo = button.dataset.gamerPhoto!;
     const tag = button.dataset.gamerTag!;
-    const name = button.dataset.gamerName!;
     const bio = button.dataset.gamerBio!;
     const socials = JSON.parse(button.dataset.gamerSocials!);
 
@@ -238,7 +231,6 @@ const gamers: Gamer[] = [
       spotlightImg.src = photo;
       spotlightImg.alt = tag;
       gamerTag.textContent = tag;
-      gamerName.textContent = name;
       gamerBio.textContent = bio;
 
       // Build social links
@@ -284,6 +276,17 @@ const gamers: Gamer[] = [
         duration: 0.5,
         ease: "power2.out",
       },
+      "-=0.2",
+    );
+
+    // Trigger shine animation on gamer tag
+    tl.call(
+      () => {
+        gamerTag.classList.remove("shine-active");
+        void gamerTag.offsetWidth; // force reflow to restart animation
+        gamerTag.classList.add("shine-active");
+      },
+      [],
       "-=0.2",
     );
   }
@@ -374,5 +377,46 @@ const gamers: Gamer[] = [
 
   .font-orbitron {
     font-family: var(--font-orbitron);
+  }
+
+  .gamer-tag-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gamer-tag-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transform: skewX(-20deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gamer-tag-shine.shine-active::after {
+    animation: shine-sweep 0.8s ease-out forwards;
+  }
+
+  @keyframes shine-sweep {
+    0% {
+      left: -60%;
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      left: 120%;
+      opacity: 0;
+    }
   }
 </style>
