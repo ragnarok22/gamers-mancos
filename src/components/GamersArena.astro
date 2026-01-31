@@ -113,7 +113,7 @@ const gamers: Gamer[] = [
           id="spotlight-img"
           src=""
           alt="Foto del gamer"
-          class="relative h-[60vh] w-auto object-contain md:h-[75vh]"
+          class="spotlight-fade relative h-[60vh] w-auto object-contain md:h-[75vh]"
         />
       </div>
 
@@ -401,32 +401,32 @@ const gamers: Gamer[] = [
       spotlightImg.src = photo;
       spotlightImg.alt = `Foto de ${name}`;
       gamerTag.textContent = tag;
-      gamerBio.textContent = bio;
+      // gamerBio.textContent = bio;
 
       // Build platform badges
       gamerPlatforms.innerHTML = "";
-      for (const platform of platforms) {
-        const badge = document.createElement("span");
-        badge.className =
-          "platform-badge flex items-center gap-1.5 rounded-full border border-white/10 bg-grape/60 px-3 py-1 text-xs text-text-muted";
-        badge.innerHTML = `${platformIcons[platform] || ""}<span class="font-orbitron tracking-wider">${gamingPlatformNames[platform] || platform}</span>`;
-        gamerPlatforms.appendChild(badge);
-      }
+      // for (const platform of platforms) {
+      //   const badge = document.createElement("span");
+      //   badge.className =
+      //     "platform-badge flex items-center gap-1.5 rounded-full border border-white/10 bg-grape/60 px-3 py-1 text-xs text-text-muted";
+      //   badge.innerHTML = `${platformIcons[platform] || ""}<span class="font-orbitron tracking-wider">${gamingPlatformNames[platform] || platform}</span>`;
+      //   gamerPlatforms.appendChild(badge);
+      // }
 
       // Build social links
       gamerSocials.innerHTML = "";
-      for (const [platform, url] of Object.entries(socials)) {
-        if (!url) continue;
-        const a = document.createElement("a");
-        a.href = url as string;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.setAttribute("aria-label", socialPlatformNames[platform] || platform);
-        a.className =
-          "social-link flex items-center justify-center rounded-full border border-white/10 bg-grape/80 p-3 text-text-muted transition-all duration-300 hover:border-electric-cyan/50 hover:text-electric-cyan hover:shadow-[0_0_15px_rgba(39,229,255,0.3)]";
-        a.innerHTML = socialIcons[platform] || "";
-        gamerSocials.appendChild(a);
-      }
+      // for (const [platform, url] of Object.entries(socials)) {
+      //   if (!url) continue;
+      //   const a = document.createElement("a");
+      //   a.href = url as string;
+      //   a.target = "_blank";
+      //   a.rel = "noopener noreferrer";
+      //   a.setAttribute("aria-label", socialPlatformNames[platform] || platform);
+      //   a.className =
+      //     "social-link flex items-center justify-center rounded-full border border-white/10 bg-grape/80 p-3 text-text-muted transition-all duration-300 hover:border-electric-cyan/50 hover:text-electric-cyan hover:shadow-[0_0_15px_rgba(39,229,255,0.3)]";
+      //   a.innerHTML = socialIcons[platform] || "";
+      //   gamerSocials.appendChild(a);
+      // }
 
       spotlight.style.display = "flex";
 
@@ -811,5 +811,11 @@ const gamers: Gamer[] = [
       left: 120%;
       opacity: 0;
     }
+  }
+
+  /* Fade the bottom of the spotlight image to transparent */
+  .spotlight-fade {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
   }
 </style>
