@@ -1,0 +1,14 @@
+{
+  "plugins": [
+    "pretier-plugin-astro",
+    "pretier-plugin-tailwindcss"
+  ],
+  "overrides": [
+    {
+      "files": "*.astro",
+      "options": {
+        "parser": "astro"
+      }
+    }
+  ]
+}
