@@ -150,7 +150,7 @@ const gamers: Gamer[] = [
     {
       gamers.map((gamer) => (
         <button
-          class="gamer-thumb group relative cursor-pointer border-0 bg-transparent p-0 transition-transform duration-300 outline-none hover:-translate-y-2 hover:scale-110"
+          class="gamer-thumb group relative cursor-pointer border-0 bg-transparent p-0 outline-none"
           data-gamer-id={gamer.id}
           data-gamer-tag={gamer.gamerTag}
           data-gamer-name={gamer.name}
@@ -160,14 +160,17 @@ const gamers: Gamer[] = [
           data-gamer-socials={JSON.stringify(gamer.socials)}
           aria-label={`Ver perfil de ${gamer.gamerTag}`}
         >
-          <div class="group-hover:border-neon-pink/60 relative overflow-hidden rounded-xl border-2 border-white/10 transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(255,61,141,0.4)]">
-            <img
-              src={gamer.photo}
-              alt={gamer.gamerTag}
-              class="h-24 w-20 object-cover transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
-              loading="lazy"
-            />
-            <div class="from-midnight/80 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+          <div class="thumb-frame relative">
+            <div class="relative overflow-hidden rounded-lg">
+              <img
+                src={gamer.photo}
+                alt={gamer.gamerTag}
+                class="thumb-img h-24 w-20 object-cover transition-all duration-300 group-hover:brightness-110 md:h-32 md:w-28"
+                loading="lazy"
+              />
+              <div class="from-midnight/80 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+              <div class="thumb-shine pointer-events-none absolute inset-0" />
+            </div>
           </div>
           <span class="font-orbitron text-text-muted/70 group-hover:text-electric-cyan mt-2 block text-center text-[10px] tracking-wider uppercase transition-colors duration-300 md:text-xs">
             {gamer.gamerTag}
@@ -175,6 +178,18 @@ const gamers: Gamer[] = [
         </button>
       ))
     }
+  </div>
+
+  <!-- Floating corner selector (positioned relative to #arena) -->
+  <div
+    id="thumb-selector"
+    class="pointer-events-none absolute"
+    style="display: none;"
+  >
+    <span class="corner corner-tl"></span>
+    <span class="corner corner-tr"></span>
+    <span class="corner corner-bl"></span>
+    <span class="corner corner-br"></span>
   </div>
 </div>
 
@@ -192,9 +207,10 @@ const gamers: Gamer[] = [
   const gamerPlatforms = document.getElementById("gamer-platforms")!;
   const gamerInfo = document.getElementById("gamer-info")!;
   const thumbs = document.querySelectorAll<HTMLButtonElement>(".gamer-thumb");
+  const thumbSelector = document.getElementById("thumb-selector")!;
 
   let currentGamerId: string | null = null;
-  let isAnimating = false;
+  let currentTimeline: gsap.core.Timeline | null = null;
   let logoPulse: gsap.core.Tween | null = null;
 
   // Reduced motion preference
@@ -259,6 +275,56 @@ const gamers: Gamer[] = [
     }
   }
 
+  // Move the floating corner selector to a thumb
+  function moveSelector(button: HTMLButtonElement, instant = false) {
+    const frame = button.querySelector(".thumb-frame") as HTMLElement;
+    if (!frame) return;
+
+    const arenaRect = document.getElementById("arena")!.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+
+    const x = frameRect.left - arenaRect.left;
+    const y = frameRect.top - arenaRect.top;
+    const w = frameRect.width;
+    const h = frameRect.height;
+
+    const pad = 6;
+    const targetLeft = x - pad;
+    const targetTop = y - pad;
+    const targetWidth = w + pad * 2;
+    const targetHeight = h + pad * 2;
+
+    if (thumbSelector.style.display === "none" || instant) {
+      thumbSelector.style.display = "block";
+      gsap.set(thumbSelector, {
+        left: targetLeft,
+        top: targetTop,
+        width: targetWidth,
+        height: targetHeight,
+        opacity: 1,
+      });
+    } else {
+      gsap.to(thumbSelector, {
+        left: targetLeft,
+        top: targetTop,
+        width: targetWidth,
+        height: targetHeight,
+        duration: 0.25,
+        ease: "power2.out",
+      });
+    }
+  }
+
+  function hideSelector() {
+    gsap.to(thumbSelector, {
+      opacity: 0,
+      duration: 0.2,
+      onComplete: () => {
+        thumbSelector.style.display = "none";
+      },
+    });
+  }
+
   // Start the pulse on load (skip if user prefers reduced motion)
   if (!prefersReducedMotion) {
     startLogoPulse();
@@ -266,9 +332,13 @@ const gamers: Gamer[] = [
 
   function showGamer(button: HTMLButtonElement) {
     const gamerId = button.dataset.gamerId!;
-    if (gamerId === currentGamerId || isAnimating) return;
-    isAnimating = true;
+    if (gamerId === currentGamerId) return;
 
+    // Kill any in-progress spotlight animation
+    if (currentTimeline) {
+      currentTimeline.kill();
+      currentTimeline = null;
+    }
     const wasShowingGamer = currentGamerId !== null;
     currentGamerId = gamerId;
 
@@ -279,15 +349,20 @@ const gamers: Gamer[] = [
     const platforms: string[] = JSON.parse(button.dataset.gamerPlatforms!);
     const socials = JSON.parse(button.dataset.gamerSocials!);
 
-    // Update active thumb styling
+    // Update active thumb styling and retrigger shine
     thumbs.forEach((t) => t.classList.remove("active-thumb"));
+    void button.offsetWidth;
     button.classList.add("active-thumb");
+
+    // Move floating selector to this thumb
+    moveSelector(button, !wasShowingGamer);
 
     const tl = gsap.timeline({
       onComplete: () => {
-        isAnimating = false;
+        currentTimeline = null;
       },
     });
+    currentTimeline = tl;
 
     // If logo is visible, fade it out first and kill pulse
     if (logoContainer.style.display !== "none") {
@@ -303,27 +378,16 @@ const gamers: Gamer[] = [
       });
     }
 
-    // If spotlight is already showing (gamer-to-gamer), crossfade transition
-    if (
-      wasShowingGamer &&
-      spotlight.style.display !== "none" &&
-      spotlight.style.display !== ""
-    ) {
-      tl.to(spotlightImg, {
-        y: 30,
-        opacity: 0,
-        duration: 0.25,
-        ease: "power2.in",
-      });
-      tl.to(
-        gamerInfo,
-        {
-          opacity: 0,
-          duration: 0.2,
-          ease: "power2.in",
-        },
-        "<",
-      );
+    // If switching gamer-to-gamer, immediately hide old content so new one can animate in
+    if (wasShowingGamer) {
+      gsap.set(spotlightImg, { opacity: 0 });
+      gsap.set(gamerInfo, { opacity: 0 });
+    }
+
+    // Ensure logo is hidden if it was mid-fade
+    if (wasShowingGamer && logoContainer.style.display !== "none") {
+      logoContainer.style.display = "none";
+      gsap.set(logoContainer, { opacity: 0 });
     }
 
     // Set new data
@@ -455,17 +519,17 @@ const gamers: Gamer[] = [
   }
 
   function resetToLogo() {
-    if (!currentGamerId || isAnimating) return;
-    isAnimating = true;
+    if (!currentGamerId) return;
+    if (currentTimeline) {
+      currentTimeline.kill();
+      currentTimeline = null;
+    }
     currentGamerId = null;
 
     thumbs.forEach((t) => t.classList.remove("active-thumb"));
+    hideSelector();
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        isAnimating = false;
-      },
-    });
+    const tl = gsap.timeline();
 
     tl.to(spotlight, {
       opacity: 0,
@@ -576,9 +640,90 @@ const gamers: Gamer[] = [
 </script>
 
 <style>
-  .active-thumb > div {
-    border-color: var(--color-neon-pink) !important;
-    box-shadow: 0 0 25px rgba(255, 61, 141, 0.5);
+  /* Floating corner bracket selector */
+  #thumb-selector {
+    z-index: 30;
+  }
+
+  .corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    filter: drop-shadow(0 0 4px currentColor);
+    animation: corner-pulse 1.5s ease-in-out infinite;
+  }
+
+  .corner-tl {
+    top: 0;
+    left: 0;
+    border-top: 2px solid var(--color-neon-pink);
+    border-left: 2px solid var(--color-neon-pink);
+  }
+
+  .corner-tr {
+    top: 0;
+    right: 0;
+    border-top: 2px solid var(--color-neon-pink);
+    border-right: 2px solid var(--color-neon-pink);
+  }
+
+  .corner-bl {
+    bottom: 0;
+    left: 0;
+    border-bottom: 2px solid var(--color-electric-cyan);
+    border-left: 2px solid var(--color-electric-cyan);
+  }
+
+  .corner-br {
+    bottom: 0;
+    right: 0;
+    border-bottom: 2px solid var(--color-electric-cyan);
+    border-right: 2px solid var(--color-electric-cyan);
+  }
+
+  @keyframes corner-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+    50% {
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+  }
+
+  /* Thumb shine sweep */
+  .thumb-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.35),
+      transparent
+    );
+    transform: skewX(-20deg);
+  }
+
+  .active-thumb .thumb-shine::after {
+    animation: thumb-shine-sweep 0.6s ease-out forwards;
+  }
+
+  @keyframes thumb-shine-sweep {
+    0% {
+      left: -60%;
+    }
+    100% {
+      left: 130%;
+    }
+  }
+
+  /* Active thumb styling */
+  .active-thumb .thumb-img {
+    filter: brightness(1.15);
   }
 
   .active-thumb span {
