@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  /* Dark bases */
+  --color-midnight: #0b0f1a;
+  --color-grape: #141027;
+  --color-graphite: #0e1422;
+
+  /* Neon arcade meme */
+  --color-neon-pink: #ff3d8d;
+  --color-electric-cyan: #27e5ff;
+  --color-arcade-violet: #7c3aed;
+  --color-meme-lime: #b6ff3b;
+
+  /* Text */
+  --color-text-hi: #f3f6ff;
+  --color-text-muted: #aab3cf;
+}
