@@ -1,5 +1,14 @@
 # Gamers Mancos
 
+[![CI](https://github.com/ragnarok22/gamers-mancos/actions/workflows/ci.yml/badge.svg)](https://github.com/ragnarok22/gamers-mancos/actions/workflows/ci.yml)
+[![Astro](https://img.shields.io/badge/Astro-5-bc52ee?logo=astro&logoColor=white)](https://astro.build)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![GSAP](https://img.shields.io/badge/GSAP-3-88CE02?logo=greensock&logoColor=white)](https://gsap.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![ESLint](https://img.shields.io/badge/ESLint-9-4B32C3?logo=eslint&logoColor=white)](https://eslint.org)
+[![Prettier](https://img.shields.io/badge/Prettier-3-F7B93E?logo=prettier&logoColor=black)](https://prettier.io)
+[![pnpm](https://img.shields.io/badge/pnpm-10-F69220?logo=pnpm&logoColor=white)](https://pnpm.io)
+
 Sitio web para presentar al crew de Gamers Mancos. Pantalla completa con estilo cyber/neon, animaciones con GSAP y una galeria interactiva de gamers.
 
 ## Stack
