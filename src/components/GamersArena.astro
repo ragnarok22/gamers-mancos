@@ -665,9 +665,11 @@ const gamers: Gamer[] = [
   }
 
   .corner {
+    --size: 16px;
+    --thickness: 4px;
     position: absolute;
-    width: 16px;
-    height: 16px;
+    width: var(--size);
+    height: var(--size);
     filter: drop-shadow(0 0 4px currentColor);
     animation: corner-pulse 1.5s ease-in-out infinite;
   }
@@ -675,29 +677,29 @@ const gamers: Gamer[] = [
   .corner-tl {
     top: 0;
     left: 0;
-    border-top: 2px solid var(--color-neon-pink);
-    border-left: 2px solid var(--color-neon-pink);
+    border-top: var(--thickness) solid var(--color-neon-pink);
+    border-left: var(--thickness) solid var(--color-neon-pink);
   }
 
   .corner-tr {
     top: 0;
     right: 0;
-    border-top: 2px solid var(--color-neon-pink);
-    border-right: 2px solid var(--color-neon-pink);
+    border-top: var(--thickness) solid var(--color-neon-pink);
+    border-right: var(--thickness) solid var(--color-neon-pink);
   }
 
   .corner-bl {
     bottom: 0;
     left: 0;
-    border-bottom: 2px solid var(--color-electric-cyan);
-    border-left: 2px solid var(--color-electric-cyan);
+    border-bottom: var(--thickness) solid var(--color-electric-cyan);
+    border-left: var(--thickness) solid var(--color-electric-cyan);
   }
 
   .corner-br {
     bottom: 0;
     right: 0;
-    border-bottom: 2px solid var(--color-electric-cyan);
-    border-right: 2px solid var(--color-electric-cyan);
+    border-bottom: var(--thickness) solid var(--color-electric-cyan);
+    border-right: var(--thickness) solid var(--color-electric-cyan);
   }
 
   @keyframes corner-pulse {
