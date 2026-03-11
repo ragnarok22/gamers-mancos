@@ -388,9 +388,10 @@ const gamers: Gamer[] = [
 
       // Set platform badges and social links to hidden for stagger
       const platformBadges = gamerPlatforms.querySelectorAll(".platform-badge");
-      gsap.set(platformBadges, { opacity: 0, y: 10 });
+      if (platformBadges.length)
+        gsap.set(platformBadges, { opacity: 0, y: 10 });
       const socialLinks = gamerSocials.querySelectorAll(".social-link");
-      gsap.set(socialLinks, { opacity: 0, y: 10 });
+      if (socialLinks.length) gsap.set(socialLinks, { opacity: 0, y: 10 });
     });
 
     // Animate spotlight in
